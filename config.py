@@ -28,18 +28,18 @@ class DevelopmentConfig(Config):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
                 cursystem is 'Windows' and 'sqlite:///' + os.path.join(basedir, \
-                'dbs/tuntunpy.db') or 'sqlite:////' + os.path.join(basedir, 'dbs/tuntunpy.db')
+                'dbs\\autumnpy.db') or 'sqlite:////' + os.path.join(basedir, 'dbs/autumnpy.db')
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'dbs/data-test.sqlite')
+                              'sqlite:///' + os.path.join(basedir, 'dbs\\data-test.db')
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'dbs/data.sqlite')
+                              'sqlite:///' + os.path.join(basedir, 'dbs\\data.db')
 
 
 config = {
