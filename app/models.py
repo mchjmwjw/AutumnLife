@@ -25,7 +25,7 @@ class User(db.Model):
 
     @password.setter
     def password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, 'pbkdf2:sha256')
 
     def verify_password(self, password):    # 返回True表示密码正确
         return check_password_hash(self.password_hash, password)
