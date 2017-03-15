@@ -6,7 +6,9 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 from flask_login import LoginManager
+from os import path
 
+root_path = path.abspath(path.dirname(__file__))
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
@@ -26,7 +28,7 @@ def create_app(config_name):
     moment.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
-
+    
     # 注册蓝本
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
@@ -34,5 +36,5 @@ def create_app(config_name):
     # 注册auth蓝本
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth') # 路由加上前缀
-
+    
     return app

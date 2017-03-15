@@ -1,7 +1,7 @@
 #coding=utf8
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
+from flask_login import UserMixin   # 管理用户认证系统，认证状态
 from . import login_manager
 
 class Role(db.Model):
@@ -37,5 +37,5 @@ class User(UserMixin, db.Model):
         return '<User %r>' % self.username
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id):         # 加载用户的回调函数
     return User.query.get(int(user_id))
