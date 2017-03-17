@@ -1,6 +1,6 @@
 #coding=utf8
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
 from ..models import User
@@ -21,10 +21,12 @@ class RegistrationForm(Form):
     
     password = PasswordField(u'密码', validators=[
         Required(), EqualTo('password2', message=
-                            '两次输入的密码必须相同！')
+                            u'两次输入的密码必须相同！')
     ])
     
     password2 = PasswordField(u'请再一次输入密码', validators=[Required()])
+    
+    sex = RadioField(u'性别', choices=((1, u"男"), (2, u"女")), coerce=int)
     
     submit = SubmitField('Register')
 

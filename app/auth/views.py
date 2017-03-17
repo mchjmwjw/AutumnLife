@@ -1,9 +1,11 @@
 #coding=utf8
 from flask import render_template, redirect, request, url_for, flash
 from . import auth
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from ..models import User
 from .forms import LoginForm, RegistrationForm
+from .. import db
+from ..email import send_email
 
 # 登录页面
 @auth.route('/login', methods=['GET', 'POST'])
@@ -33,14 +35,43 @@ def logout():
     flash(u'用户已注销!')
     return redirect(url_for('main.index'))
 
-@auth.route('auth/register')
+@auth.route('auth/register',  methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email = form.email.data,
-                    user = form.username.data,
-                    password = form.password.data)
+        user = User(email=form.email.data,
+                    username=form.username.data,
+                    password=form.password.data,
+                    sex=form.sex.data)
         db.session.add(user)
-        flash(u'正在登录')
-        return redirect(url_for('auth.login'))
-    return render_template('auth/register.html', form = form)
+        db.session.commit()
+        token = user.generate_confirmation_token()
+        send_email(user.email, u'验证你的账户', 'auth/email/confirm', user=user, token=token)
+        flash(u'验证邮件已经发放至你的邮箱')
+        return redirect(url_for('main.index'))
+    return render_template('auth/register.html', form=form)
+
+@auth.route('/confirm/<token>')
+@login_required             # 保护路由，必须先登录才能执行之后的视图函数
+def confirm(token):
+    if current_user.confirmed:
+        return redirect(url_for('main.index'))
+    if current_user.confirm(token):
+        flash('You have confirmed your account. Thanks!')
+    else:
+        flash('The confirmation link is invalid or has expired.')
+    return redirect(url_for('main.index'))
+
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated \
+            and not current_user.confirmed \
+            and request.endpoint[:5] != 'auth.' \
+            and request.endpoint != 'static':
+        return redirect(url_for('auth.unconfirmed'))
+
+@auth.route('/unconfirmed')
+def unconfirmed():
+    if current_user.is_anonymous or current_user.confirmed:   # is_anonymous() 匿名用户返回True
+        return redirect(url_for('main.index'))
+    return render_template('auth/unconfirmed.html')
