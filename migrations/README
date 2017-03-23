@@ -1,0 +1,10 @@
+Generic single-database configuration.
+
+1. 创建迁移仓库
+python manage.py db init
+
+2. 创建迁移脚本
+python manage.py db migrate -m "initial migration"
+
+3. 更新数据库
+python manage.py db upgrade
