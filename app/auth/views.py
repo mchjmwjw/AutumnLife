@@ -35,7 +35,7 @@ def logout():
     flash(u'用户已注销!')
     return redirect(url_for('main.index'))
 
-@auth.route('auth/register',  methods=['GET', 'POST'])
+@auth.route('/register',  methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -76,3 +76,12 @@ def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:   # is_anonymous() 匿名用户返回True
         return redirect(url_for('main.index'))
     return render_template('auth/unconfirmed.html')
+
+@auth.route('/confirm')
+@login_required
+def resend_confirmation():
+    token = current_user.generate_confirmation_token()
+    send_email(current_user.email,  'Confirm Your Account',
+            'auth/email/confirm', user=current_user, token=token)
+    flash('A new confirmation email has been sent to you by email.')
+    return redirect(url_for('main.index'))

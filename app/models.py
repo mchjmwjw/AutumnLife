@@ -87,7 +87,7 @@ class User(UserMixin, db.Model):
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)    # 调用父类的构造方法
         if self.role is None:
-            if self.email == current_app.comfig['AUTNMULIFE_ADMIN']:
+            if self.email == current_app.config['AUTUMNLIFE_ADMIN']:
                 self.role = Role.query.filter_by(permissions=0xff).first()  # 管理员角色
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()  # 非管理员角色
