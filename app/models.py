@@ -49,11 +49,12 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
     name = db.Column(db.String(64))
-    location = db.Column(db.String(64))
-    about_me = db.Column(db.Text())
-    member_since = db.Column(db.DateTime(),  default=datetime.utcnow)
-    last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
-    
+    location = db.Column(db.String(64)) # 所在地
+    about_me = db.Column(db.Text()) # 自我介绍
+    member_since = db.Column(db.DateTime(),  default=datetime.utcnow) # 注册日期
+    last_seen = db.Column(db.DateTime(), default=datetime.utcnow) # 最后访问日期
+    #  db.Column() 的 default 参数可以接受函数作为默认值
+
     @property
     def password(self):     # 试图读取password的值将会报错
         raise AttributeError('password is not a readable attribute')
