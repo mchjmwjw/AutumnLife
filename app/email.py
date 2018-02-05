@@ -1,12 +1,17 @@
+# coding=utf8
+
 from flask import render_template, current_app
 from threading import Thread
 from flask_mail import Message
 from . import mail
 
+
 def send_async_email(app, msg):
     with app.app_context():
         mail.send(msg)
 
+
+# 发送邮件
 def send_email(to, subject, template, **kwargs):
     app = current_app._get_current_object()
     msg = Message(app.config['AUTUMNLIFE_MAIL_SUBJECT_PREFIX'] + ' ' + subject,

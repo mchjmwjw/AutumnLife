@@ -7,6 +7,8 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
 from datetime import *
 
+
+# 角色
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -39,6 +41,8 @@ class Role(db.Model):
             db.session.add(role)
         db.session.commit()
 
+
+# 用户资料
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -103,9 +107,11 @@ class User(UserMixin, db.Model):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
 
+
 @login_manager.user_loader
 def load_user(user_id):         # 加载用户的回调函数
     return User.query.get(int(user_id))
+
 
 class Permission:
     FOLLOW = 0x01
@@ -113,11 +119,12 @@ class Permission:
     WRITE_ARTICLE = 0x04
     MODERATE_COMMENTS = 0x08
     ADMINISTER = 0x80
-    
+
+
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
         return False
-    
+
     def is_administrator(self):
         return False
     
