@@ -25,7 +25,7 @@ class EditProfileAdminForm(Form):
                                                           '用户名至少包含一个字母、数字、'
                                                           '小数点或下划线')])
     confirmed = BooleanField('确认')
-    role = SelectField('角色', coerce=int)
+    role = SelectField('角色', coerce=int)  # 把字段的值转换为整数
     name = StringField('真实姓名', validators=[Length(0, 64)])
     location = StringField('Location', validators=[Length(0, 64)])
     about_me = TextAreaField('简介')
@@ -36,6 +36,7 @@ class EditProfileAdminForm(Form):
                              for role in Role.query.order_by(Role.name).all()]
         self.user = user
 
+    # http://blog.csdn.net/hyman_c/article/details/53998812
     def validate_email(self, field):
         if field.data != self.user.email and \
                 User.query.filter_by(email=field.data).first():
