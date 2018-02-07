@@ -7,13 +7,25 @@
 <div class="page-header">
     <h1>登录</h1>
 </div>
-<div class="col-md-4">
-    {{ wtf.quick_form(form) }}
-</div>
-<p>
-新用户?
-<a href="{{ url_for('auth.register') }}">
-点击注册
-</a>
-</p>
+<form class="form form-horizontal" action method="post" role="form">
+    <div hidden="true">
+        {{ wtf.form_field(form.csrf_token) }}
+    </div>
+    {{ wtf.form_field(form.email) }}
+    {{ wtf.form_field(form.password) }}
+    <div>
+        <div style="display: inline-block">
+        {{ wtf.form_field(form.remember_me) }}
+        </div>
+        <p style="display: inline-block">
+            <a href="{{ url_for('auth.password_reset_request') }}">&nbsp;&nbsp;忘记密码</a>
+            <a href="{{ url_for('auth.register') }}">&nbsp;&nbsp;新用户注册</a>
+        </p>
+    </div>
+    {{ wtf.form_field(form.submit) }}
+</form>
+<!--<div class="col-md-4">-->
+    <!--{{ wtf.quick_form(form) }}-->
+<!--</div>-->
+
 {% endblock %}

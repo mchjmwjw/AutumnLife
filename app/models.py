@@ -4,8 +4,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin   # 管理用户认证系统，认证状态
 from . import login_manager
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import current_app
+from flask import current_app, request
 from datetime import *
+import hashlib
 
 
 # 角色
@@ -100,12 +101,42 @@ class User(UserMixin, db.Model):
     def can(self, permissions):
         return self.role is not None and \
                (self.role.permissions & permissions) == permissions
+
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
 
     def ping(self):
         self.last_seen = datetime.utcnow()
         db.session.add(self)
+
+    # 头像
+    def gravatar(self, size=100, default='identicon', rating='g'):
+        if request.is_secure:
+            url = 'https://secure.gravatar.com/avatar'
+        else:
+            url = 'http://www.gravatar.com/avatar'
+        hhash = hashlib.md5(self.email.encode('utf-8')).hexdigest()
+        return '{url}/{hhash}?s={size}&d={default}&r={rating}'.format(
+            url=url, hhash=hhash, size=size, default=default, rating=rating
+        )
+
+    def generate_reset_token(self, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'reset': self.id}).decode('utf-8')
+
+    @staticmethod
+    def reset_password(token, new_password):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return False
+        user = User.query.get(data.get('reset'))
+        if user is None:
+            return False
+        user.password = new_password
+        db.session.add(user)
+        return True
 
 
 @login_manager.user_loader

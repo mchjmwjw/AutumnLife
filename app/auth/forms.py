@@ -1,19 +1,19 @@
 # coding=utf8
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
-from wtforms.validators import Required, Length, Email, Regexp, EqualTo
+from wtforms.validators import Required, Length, Email, Regexp, EqualTo, DataRequired
 from wtforms import ValidationError
 from ..models import User
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     email = StringField(u'电子邮箱', validators=[Required(), Length(1, 64), Email()])
     password = PasswordField(u'密码', validators=[Required()])
     remember_me = BooleanField(u'自动登录')
     submit = SubmitField(u'登录')
 
 
-class RegistrationForm(Form):
+class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[
         Required(), Length(1, 64), Email()])
     
@@ -41,8 +41,19 @@ class RegistrationForm(Form):
             raise ValidationError('Username already in use.')
 
 
-class ChangePasswordForm(Form):
-    old_password = PasswordField('旧密码',  validators=[DataRequired()])
+class ChangePasswordForm(FlaskForm):
+    old_password = PasswordField('旧密码', validators=[DataRequired()])
     password = PasswordField('新密码', validators=[DataRequired(), EqualTo('password2', message='Passwords must match.')])
-    password2 = PasswordField('确认新密码', validators = [DataRequired()])
+    password2 = PasswordField('确认新密码', validators=[DataRequired()])
     submit = SubmitField('更新密码')
+
+
+class PasswordResetRequestForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Length(1, 64),Email()])
+    submit = SubmitField('重置密码')
+
+
+class PasswordResetForm(FlaskForm):
+    password = PasswordField('新密码', validators=[DataRequired(), EqualTo('password2', message='两次密码必须相同')])
+    password2 = PasswordField('再次输入密码', validators=[DataRequired()])
+    submit = SubmitField('重置密码')

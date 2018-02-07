@@ -4,7 +4,7 @@ import os
 import app
 from . import main
 from flask_login import login_required, current_user
-from ..models import User
+from ..models import User, Role
 from .forms import EditProfileForm, EditProfileAdminForm
 from ..decorators import admin_required
 from .. import db
