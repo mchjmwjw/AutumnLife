@@ -54,11 +54,13 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
     name = db.Column(db.String(64))
-    location = db.Column(db.String(64)) # 所在地
-    about_me = db.Column(db.Text()) # 自我介绍
-    member_since = db.Column(db.DateTime(),  default=datetime.utcnow) # 注册日期
-    last_seen = db.Column(db.DateTime(), default=datetime.utcnow) # 最后访问日期
+    location = db.Column(db.String(64))  # 所在地
+    about_me = db.Column(db.Text())  # 自我介绍
+    member_since = db.Column(db.DateTime(),  default=datetime.now) # 注册日期
+    last_seen = db.Column(db.DateTime(), default=datetime.now)  # 最后访问日期
     #  db.Column() 的 default 参数可以接受函数作为默认值
+    avatar_hash = db.Column(db.String(32))
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     @property
     def password(self):     # 试图读取password的值将会报错
@@ -97,6 +99,9 @@ class User(UserMixin, db.Model):
                 self.role = Role.query.filter_by(permissions=0xff).first()  # 管理员角色
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()  # 非管理员角色
+        if self.email is not None and self.avatar_hash is None:
+            self.avatar_hash = hashlib.md5(
+                self.email.encode('utf-8')).hexdigest()
     
     def can(self, permissions):
         return self.role is not None and \
@@ -115,7 +120,7 @@ class User(UserMixin, db.Model):
             url = 'https://secure.gravatar.com/avatar'
         else:
             url = 'http://www.gravatar.com/avatar'
-        hhash = hashlib.md5(self.email.encode('utf-8')).hexdigest()
+        hhash = self.avatar_hash or hashlib.md5(self.email.encode('utf-8')).hexdigest()
         return '{url}/{hhash}?s={size}&d={default}&r={rating}'.format(
             url=url, hhash=hhash, size=size, default=default, rating=rating
         )
@@ -158,5 +163,13 @@ class AnonymousUser(AnonymousUserMixin):
 
     def is_administrator(self):
         return False
-    
+
+
+class Post(db.Model):
+    __tablename__='posts'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.now)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
 login_manager.anonymous_user = AnonymousUser

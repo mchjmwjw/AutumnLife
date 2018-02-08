@@ -47,3 +47,9 @@ class EditProfileAdminForm(FlaskForm):
         if field.data != self.user.username and \
                 User.query.filter_by(username=field.data).first():
             raise ValidationError('该用户名已经被注册使用!')
+
+
+# 发表博客
+class PostForm(FlaskForm):
+    body = TextAreaField("你有什么想要说的?", validators=[Required()])
+    submit = SubmitField('提交')

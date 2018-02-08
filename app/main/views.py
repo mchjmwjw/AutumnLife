@@ -4,8 +4,8 @@ import os
 import app
 from . import main
 from flask_login import login_required, current_user
-from ..models import User, Role
-from .forms import EditProfileForm, EditProfileAdminForm
+from ..models import User, Role, Post, Permission
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm
 from ..decorators import admin_required
 from .. import db
 import sys
@@ -13,8 +13,16 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 
-@main.route('/')
+@main.route('/', methods=['GET', 'POST'])
 def index():
+    # form = PostForm()
+    # if current_user.can(Permission.WRITE_ARTICLE) and \
+    #     form.validate_on_submit:
+    #     post = Post(body=form.body.data,
+    #                 author=current_user._get_current_object())
+    #     db.session.add(post)
+    #     return redirect(url_for('.index'))
+    #posts = Post.query.order_by(Post.timestamp.desc()).all()
     return render_template('index.html')
 
 
