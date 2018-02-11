@@ -13,6 +13,7 @@ class Config:
     AUTUMNLIFE_MAIL_SUBJECT_PREFIX = '[AutumnLife]' # 邮件名称抬头
     AUTUMNLIFE_MAIL_SENDER = 'Hoster Wang <' + str(os.environ.get('MAIL_USERNAME')) + '>' # 邮件发送人
     AUTUMNLIFE_ADMIN = os.environ.get('AUTUMNLIFE_ADMIN')
+    AUTUMNLIFE_POSTS_PER_PAGE = 10
 
     @staticmethod
     def init_app(app):
